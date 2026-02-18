@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using UserApi.Data.Dtos;
 using UserApi.Models;
+using UserApi.Services;
 
 namespace UserApi.Controllers
 {
@@ -10,37 +11,20 @@ namespace UserApi.Controllers
     [ApiController]
     [Route("[Controller]")]
     public class UserController : ControllerBase
-    {
-        private readonly ILogger<UserController> _logger;
+    {   
+        private RegisterService _registerService;
 
-        private IMapper _mapper;
-        private UserManager<User> _userManager;
-
-        public UserController(ILogger<UserController> logger, IMapper mapper, UserManager<User> userManager)
+        public UserController(RegisterService registerService)
         {
-            _logger = logger;
-            _mapper = mapper;
-            _userManager = userManager;
+            _registerService = registerService;
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateUser(CreateUserDto userDto)
         {
-            // Here you would typically add code to save the user to a database
-            _logger.LogInformation("User created: {Name}, {BirthDate}", userDto.Username, userDto.BirthDate);
+            await _registerService.Register(userDto);
+            return Ok(new { Message = "User created successfully", User = userDto });
 
-            User user = _mapper.Map<User>(userDto);
-
-            IdentityResult result = await _userManager.CreateAsync(user, userDto.Password);
-
-            if (result.Succeeded)
-            {
-                return Ok(new { Message = "User created successfully", User = userDto });
-            }
-            else
-            {
-                return BadRequest(result.Errors);
-            }
         }
     }
 }
