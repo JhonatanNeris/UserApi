@@ -11,7 +11,7 @@ using UserApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("UserConnection");
+var connectionString = builder.Configuration["ConnectionStrings:UserConnection"];
 
 // Add services to the container.
 builder.Services.AddDbContext<UserDbContext>(options =>
@@ -33,7 +33,7 @@ builder.Services.AddAuthentication(options =>
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("alskjdiud10du01ujo21ih283280y23h")),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["SymmetricSecurityKey"])),
         ValidateAudience = false,
         ValidateIssuer = false,
         ClockSkew = TimeSpan.Zero
